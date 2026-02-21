@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volatility Manager</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { margin:0; font-family: system-ui, sans-serif; background: #0a0e17; color: #fff; padding: 16px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .logo { font-size: 28px; font-weight: bold; background: linear-gradient(90deg, #ffd700, #ffaa00); -webkit-background-clip: text; color: transparent; }
+    .price { font-size: 32px; font-weight: bold; text-align: center; margin: 10px 0; }
+    .cloud { font-size: 60px; animation: pulse 2s infinite; display: block; text-align: center; margin: 20px 0; }
+    @keyframes pulse { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+    .signal { background: rgba(255, 215, 0, 0.15); border: 2px solid #ffd700; border-radius: 12px; padding: 16px; margin: 20px 0; }
+    button { width: 100%; padding: 16px; margin: 10px 0; background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; }
+    .info { font-size: 14px; opacity: 0.8; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">VOLATILITY MANAGER</div>
+    <div style="font-size:12px; opacity:0.6;">ранние сигналы всплеска</div>
+  </div>
+
+  <div id="price" class="price">$68 405</div>
+  <div style="text-align:center; color:#00ff9d; font-size:14px;" id="change">+1.2% (24ч)</div>
+
+  <div class="cloud" id="cloud">☁️</div>
+
+  <div class="signal">
+    <strong>Статус сигнала:</strong><br>
+    <span id="status" style="color:#ffd700; font-size:18px;">🟢 Золотое облако сформировано!</span>
+  </div>
+
+  <div class="info">
+    Биткоин возвращается к центральной оси консолидации на отметке $69 032.<br><br>
+    Динамическая цель треугольника — $74 600.<br><br>
+    Подтверждение: пробой верхней границы ≈ $69 900
+  </div>
+
+  <button onclick="simulateSignal()">Симулировать новый сигнал</button>
+  <button onclick="Telegram.WebApp.close()">Закрыть</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.setHeaderColor('#0a0e17');
+    tg.setBackgroundColor('#0a0e17');
+
+    let priceElement = document.getElementById('price');
+    let changeElement = document.getElementById('change');
+
+    async function updatePrice() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
+        const data = await res.json();
+        const btc = data.bitcoin;
+        priceElement.textContent = '$' + btc.usd.toLocaleString('ru-RU');
+        changeElement.textContent = (btc.usd_24h_change > 0 ? '+' : '') + btc.usd_24h_change.toFixed(1) + '% (24ч)';
+      } catch(e) { console.log('API error'); }
+    }
+
+    function simulateSignal() {
+      const cloud = document.getElementById('cloud');
+      const status = document.getElementById('status');
+      cloud.textContent = '✨☁️✨';
+      status.innerHTML = '🔥 МОЩНЫЙ ВСПЛЕСК ОЖИДАЕТСЯ!';
+      setTimeout(() => {
+        cloud.textContent = '☁️';
+        status.innerHTML = '🟢 Золотое облако сформировано!';
+      }, 3000);
+      tg.showPopup({title: 'Сигнал!', message: 'Золотое облако активировано! Готовься к волатильности 🚀'});
+    }
+
+    updatePrice();
+    setInterval(updatePrice, 10000);
+  </script>
+</body>
+</html>
