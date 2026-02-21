@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="text-right">
-                <div id="live-price" class="text-4xl font-bold gold">68 405</div>
+                <div id="live-price" class="text-4xl font-bold gold">68 405.67</div>
                 <div id="live-pair" class="text-xs text-green-400">BTCUSDT • +0.47%</div>
             </div>
         </div>
@@ -51,13 +51,17 @@
         tg.expand();
         tg.setHeaderColor("#0a0a0a");
 
-        let currentPrice = 68405;
+        let currentPrice = 68405.67;
 
+        // Форматування з пробілами і двома десятковими знаками
         function formatPrice(price) {
-            return Math.floor(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+            return price.toLocaleString('ru-RU', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         }
 
-        // Оновлення реальної ціни кожні 450 мс
+        // Оновлення ціни кожні 300 мс
         async function updateLivePrice() {
             try {
                 const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
@@ -117,9 +121,9 @@
             addSignal(s, t, signalPrice, e);
         }
 
-        // Запуск оновлення ціни
-        setInterval(updateLivePrice, 450);
-        updateLivePrice();
+        // Оновлення кожні 300 мс
+        setInterval(updateLivePrice, 300);
+        updateLivePrice(); // перший запит
 
         // Авто-симуляція
         setInterval(() => {
