@@ -6,83 +6,152 @@
     <title>Volatility Manager</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { background: linear-gradient(180deg, #0a0a0a, #111827); color: #fff; font-family: system-ui; }
-        .glass { background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,234,0,0.15); }
-        .gold { color: #ffea00; }
+        body { background: #05050a; color: #fff; font-family: system-ui; overflow: hidden; }
+        canvas { display: block; margin: 0 auto; }
+        .gold { color: #ffea00; text-shadow: 0 0 20px #ffea00; }
     </style>
 </head>
-<body class="min-h-screen pb-24">
+<body class="min-h-screen">
 
-    <!-- Header -->
-    <div class="px-5 pt-12 pb-6">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center text-3xl shadow-xl">⚡</div>
-                <div>
-                    <h1 class="text-3xl font-black tracking-tighter">VOLATILITY</h1>
-                    <p class="text-yellow-400 text-sm -mt-1">MANAGER</p>
-                </div>
-            </div>
-        </div>
+    <div class="text-center pt-8">
+        <h1 class="text-4xl font-black tracking-tighter gold">VOLATILITY RADAR</h1>
+        <p class="text-yellow-400 text-sm -mt-1">LIVE MONITORING</p>
     </div>
 
-    <!-- Моніторинг пар -->
-    <div class="px-5">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold">Моніторинг пар</h2>
-            <button onclick="updateAllPrices()" 
-                    class="text-yellow-400 text-sm flex items-center gap-1 hover:text-yellow-300 transition">
-                <i class="fas fa-sync-alt"></i> Оновити
-            </button>
-        </div>
-
-        <div id="pairs-list" class="space-y-3"></div>
+    <!-- Радар -->
+    <div class="flex justify-center mt-6">
+        <canvas id="radar" width="380" height="380"></canvas>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.setHeaderColor("#0a0a0a");
+        tg.setHeaderColor("#05050a");
 
-        // Порядок за капіталізацією
+        const canvas = document.getElementById("radar");
+        const ctx = canvas.getContext("2d");
+        const centerX = 190;
+        const centerY = 190;
+        const radius = 160;
+
         const pairs = [
-            "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", 
-            "BNBUSDT", "DOGEUSDT", "TONUSDT", "ADAUSDT"
+            { name: "BTC", symbol: "BTCUSDT", angle: 0 },
+            { name: "ETH", symbol: "ETHUSDT", angle: 45 },
+            { name: "SOL", symbol: "SOLUSDT", angle: 90 },
+            { name: "XRP", symbol: "XRPUSDT", angle: 135 },
+            { name: "BNB", symbol: "BNBUSDT", angle: 180 },
+            { name: "DOGE", symbol: "DOGEUSDT", angle: 225 },
+            { name: "TON", symbol: "TONUSDT", angle: 270 },
+            { name: "ADA", symbol: "ADAUSDT", angle: 315 }
         ];
 
-        async function updateAllPrices() {
-            const container = document.getElementById("pairs-list");
-            container.innerHTML = "";
+        let prices = {};
+        let activeSignals = {}; // { "BTCUSDT": {expand: 1.74, time: Date.now()} }
 
-            for (let symbol of pairs) {
+        // Оновлення цін кожні 300 мс
+        async function updatePrices() {
+            for (let pair of pairs) {
                 try {
-                    const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+                    const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair.symbol}`);
                     const data = await res.json();
-                    const price = parseFloat(data.price);
-
-                    const html = `
-                        <div class="glass rounded-3xl px-6 py-5 flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <span class="text-2xl font-bold">${symbol.replace("USDT", "")}</span>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-white">${price.toLocaleString('ru-RU')}</div>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += html;
-                } catch(e) {
-                    console.log("Помилка з", symbol);
-                }
+                    prices[pair.symbol] = parseFloat(data.price);
+                } catch(e) {}
             }
+            drawRadar();
         }
 
-        // Перше завантаження
-        window.onload = () => {
-            updateAllPrices();
-        };
+        function drawRadar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Круги радара
+            ctx.strokeStyle = "rgba(255,234,0,0.15)";
+            ctx.lineWidth = 2;
+            for (let r = 40; r <= radius; r += 40) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Лінії
+            ctx.strokeStyle = "rgba(255,234,0,0.2)";
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * 45) * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
+                ctx.stroke();
+            }
+
+            // Пари на радарі
+            pairs.forEach((pair, i) => {
+                const angle = (pair.angle * Math.PI) / 180;
+                const x = centerX + Math.cos(angle) * (radius - 35);
+                const y = centerY + Math.sin(angle) * (radius - 35);
+
+                const isActive = activeSignals[pair.symbol];
+
+                // Точка пари
+                ctx.fillStyle = isActive ? "#ffea00" : "#aaa";
+                ctx.beginPath();
+                ctx.arc(x, y, isActive ? 9 : 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (isActive) {
+                    // Пульсуюче кільце
+                    ctx.strokeStyle = "#ffea00";
+                    ctx.lineWidth = 3;
+                    ctx.globalAlpha = Math.sin(Date.now() / 150) * 0.5 + 0.5;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 18, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+
+                // Назва пари
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 13px system-ui";
+                ctx.textAlign = "center";
+                ctx.fillText(pair.name, x, y + 32);
+            });
+        }
+
+        function triggerSignal(symbol, expand) {
+            activeSignals[symbol] = { expand, time: Date.now() };
+
+            // Автоматично зникає через 12 секунд
+            setTimeout(() => {
+                delete activeSignals[symbol];
+            }, 12000);
+
+            drawRadar();
+
+            // Попап
+            tg.showPopup({
+                title: "🟡 ЗОЛОТЕ ОБЛАКО!",
+                message: `${symbol}\nExpand: ${expand}x`,
+                buttons: [{type: "ok"}]
+            });
+        }
+
+        // Симуляція сигналу (для тесту)
+        function simulateSignal() {
+            const randomPair = pairs[Math.floor(Math.random() * pairs.length)];
+            const expand = (1.4 + Math.random() * 0.8).toFixed(2);
+            triggerSignal(randomPair.symbol, expand);
+        }
+
+        // Оновлення цін кожні 300 мс
+        setInterval(updatePrices, 300);
+        updatePrices();
+
+        // Авто-симуляція сигналу кожні 25 секунд
+        setInterval(() => {
+            if (Math.random() > 0.7) simulateSignal();
+        }, 25000);
+
+        // Перший сигнал через 2 секунди
+        setTimeout(simulateSignal, 2000);
     </script>
 </body>
 </html>
