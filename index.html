@@ -11,8 +11,8 @@
         body { background: linear-gradient(180deg, #0a0a0a, #111827); color: #fff; font-family: system-ui; }
         .gold { color: #ffea00; }
         .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255,234,0,0.2); }
-        .signal { animation: signalPop 0.5s ease-out; }
-        @keyframes signalPop { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -48,23 +48,36 @@
         <div id="signals" class="space-y-6"></div>
     </div>
 
+    <!-- Модальне вікно з графіком -->
+    <div id="chartModal" class="modal flex items-center justify-center">
+        <div class="w-full max-w-md bg-zinc-950 rounded-3xl overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-white/10">
+                <div id="modalTitle" class="font-bold text-lg"></div>
+                <button onclick="closeChart()" class="text-3xl text-zinc-400 hover:text-white">✕</button>
+            </div>
+            <iframe id="chartFrame" src="" class="w-full" style="height: 520px;"></iframe>
+        </div>
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.setHeaderColor("#0a0a0a");
 
         function openChart(symbol, tf) {
-            // Перетворюємо ТФ в TradingView формат
-            let interval = "15";
-            if (tf === "5m") interval = "5";
-            if (tf === "15m") interval = "15";
-            if (tf === "30m") interval = "30";
-            if (tf === "1h") interval = "60";
-            if (tf === "4h") interval = "240";
-            if (tf === "1d") interval = "D";
+            document.getElementById("modalTitle").textContent = `${symbol} • ${tf}`;
+            
+            // TradingView вбудований графік (темна тема)
+            const interval = tf === "5m" ? "5" : tf === "15m" ? "15" : tf === "30m" ? "30" : "60";
+            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}&theme=dark&hide_side_toolbar=1&hide_top_toolbar=1&hide_legend=1`;
+            
+            document.getElementById("chartFrame").src = url;
+            document.getElementById("chartModal").style.display = "flex";
+        }
 
-            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}`;
-            tg.openLink(url);
+        function closeChart() {
+            document.getElementById("chartModal").style.display = "none";
+            document.getElementById("chartFrame").src = ""; // очищаємо
         }
 
         function addSignal(symbol, tf, price, expand) {
@@ -72,30 +85,25 @@
             const time = new Date().toLocaleTimeString("uk-UA", {hour:"2-digit", minute:"2-digit"});
 
             const html = `
-                <div class="signal card rounded-3xl p-6">
+                <div class="card rounded-3xl p-6">
                     <div class="flex justify-between items-start">
                         <div>
                             <span class="text-3xl font-bold gold">${symbol}</span>
-                            <span class="ml-4 text-zinc-400 text-lg">${tf}</span>
+                            <span class="ml-4 text-zinc-400">${tf}</span>
                         </div>
                         <div class="text-right">
                             <div class="text-xs text-zinc-400">${time}</div>
                             <div class="text-3xl font-bold">${parseInt(price).toLocaleString()}</div>
                         </div>
                     </div>
-
-                    <div class="mt-6 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <span class="text-4xl">🟡</span>
-                            <div>
-                                <div class="font-semibold">Золоте облако</div>
-                                <div class="text-yellow-400">Expand <span class="font-bold">${expand}x</span></div>
-                            </div>
+                    <div class="mt-6 flex gap-3">
+                        <div class="flex-1">
+                            <div class="text-sm text-zinc-400">Золоте облако</div>
+                            <div class="text-yellow-400 text-lg">Expand <span class="font-bold">${expand}x</span></div>
                         </div>
-                        
                         <button onclick="openChart('${symbol}', '${tf}')" 
-                                class="bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition">
-                            📈 Відкрити графік
+                                class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl font-medium flex items-center justify-center gap-2 transition">
+                            📈 Графік
                         </button>
                     </div>
                 </div>
@@ -120,17 +128,8 @@
             });
         }
 
-        function clearSignals() {
-            document.getElementById("signals").innerHTML = "";
-        }
-
-        // Авто-симуляція кожні 20 секунд
-        setInterval(() => {
-            if (Math.random() > 0.6) simulateSignal();
-        }, 20000);
-
-        // Перший сигнал при завантаженні
-        window.onload = () => setTimeout(simulateSignal, 800);
+        // Перший сигнал
+        window.onload = () => setTimeout(simulateSignal, 700);
     </script>
 </body>
 </html>
