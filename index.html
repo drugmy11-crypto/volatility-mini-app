@@ -8,66 +8,82 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { background: linear-gradient(180deg, #0a0a0a, #111111); color: #fff; font-family: 'Inter', system-ui; }
-        .gold { color: #ffea00; }
-        .card { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); }
-        .signal { animation: signalPop 0.4s ease-out; }
-        @keyframes signalPop { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            background: linear-gradient(180deg, #0a0a0a 0%, #111827 100%);
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .gold-gradient { background: linear-gradient(90deg, #ffea00, #facc15, #eab308); }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,234,0,0.15);
+        }
+        .signal {
+            animation: signalPop 0.5s ease-out forwards;
+        }
+        @keyframes signalPop {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .live-dot {
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-24">
 
     <!-- Header -->
-    <div class="px-5 pt-8 pb-4 border-b border-white/10">
-        <div class="flex justify-between items-center">
+    <div class="px-5 pt-10 pb-6">
+        <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center text-2xl">⚡</div>
+                <div class="w-11 h-11 gold-gradient rounded-2xl flex items-center justify-center text-3xl shadow-lg">⚡</div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tighter">VOLATILITY</h1>
-                    <p class="text-xs text-yellow-400 -mt-1">MANAGER</p>
+                    <h1 class="text-3xl font-black tracking-tighter">VOLATILITY</h1>
+                    <p class="text-yellow-400 text-sm -mt-1">MANAGER</p>
                 </div>
             </div>
             <div class="text-right">
-                <div id="live-price" class="text-4xl font-bold gold">68 405</div>
-                <div class="text-xs text-green-400 flex items-center justify-end gap-1">
-                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    BTCUSDT • +0.42%
+                <div id="live-price" class="text-4xl font-bold text-yellow-300">68 405</div>
+                <div class="flex items-center gap-1.5 justify-end text-green-400 text-sm">
+                    <div class="w-2 h-2 bg-green-400 rounded-full live-dot"></div>
+                    BTCUSDT • +0.47%
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Quick Action -->
-    <div class="px-5 mt-6">
+    <div class="px-5">
         <button onclick="simulateSignal()" 
-                class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold py-7 rounded-3xl text-xl shadow-2xl shadow-yellow-500/30 active:scale-95 transition">
-            🟡 СИМУЛЮВАТИ ЗОЛОТЕ ОБЛАКО
+                class="w-full gold-gradient text-black font-black py-8 rounded-3xl text-2xl shadow-2xl shadow-yellow-500/50 active:scale-95 transition-all">
+            🟡 ЗОЛОТЕ ОБЛАКО
         </button>
     </div>
 
-    <!-- Recent Signals -->
-    <div class="px-5 mt-8">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="font-semibold text-lg">Останні сигнали</h2>
-            <span onclick="clearSignals()" class="text-xs text-zinc-400 cursor-pointer">Очистити</span>
+    <!-- Signals -->
+    <div class="px-5 mt-10">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold">Останні сигнали</h2>
+            <span onclick="clearSignals()" class="text-yellow-400 text-sm cursor-pointer">Очистити</span>
         </div>
-        <div id="signals" class="space-y-4"></div>
+        <div id="signals" class="space-y-5"></div>
     </div>
 
     <!-- Bottom Navigation -->
-    <div class="fixed bottom-0 left-0 right-0 bg-zinc-950 border-t border-white/10 py-2">
+    <div class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-lg border-t border-white/10 py-3">
         <div class="flex justify-around text-xs">
             <button onclick="switchTab(0)" class="flex flex-col items-center text-yellow-400">
-                <i class="fas fa-home text-xl mb-1"></i>
-                Головна
+                <i class="fas fa-home text-2xl mb-1"></i>
+                <span>Головна</span>
             </button>
             <button onclick="switchTab(1)" class="flex flex-col items-center">
-                <i class="fas fa-bell text-xl mb-1"></i>
-                Сигнали
+                <i class="fas fa-list text-2xl mb-1"></i>
+                <span>Сигнали</span>
             </button>
             <button onclick="switchTab(2)" class="flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl mb-1"></i>
-                Статус
+                <i class="fas fa-chart-line text-2xl mb-1"></i>
+                <span>Статус</span>
             </button>
         </div>
     </div>
@@ -77,74 +93,67 @@
         tg.expand();
         tg.setHeaderColor("#0a0a0a");
 
-        let signalCount = 0;
-
         function addSignal(symbol, tf, price, expand) {
-            signalCount++;
-            const signalsDiv = document.getElementById("signals");
-            const time = new Date().toLocaleTimeString("uk-UA", {hour: "2-digit", minute: "2-digit"});
-
+            const div = document.getElementById("signals");
+            const time = new Date().toLocaleTimeString("uk-UA", {hour:"2-digit", minute:"2-digit"});
+            
             const html = `
-                <div class="signal card rounded-3xl p-5 border border-yellow-400/20">
-                    <div class="flex justify-between items-start">
+                <div class="signal card rounded-3xl p-6">
+                    <div class="flex justify-between">
                         <div>
-                            <span class="text-2xl font-bold gold">${symbol}</span>
-                            <span class="ml-3 text-zinc-400">${tf}</span>
+                            <span class="text-3xl font-bold text-yellow-300">${symbol}</span>
+                            <span class="ml-4 text-zinc-400">${tf}</span>
                         </div>
                         <div class="text-right">
                             <div class="text-xs text-zinc-400">${time}</div>
-                            <div class="text-2xl font-bold">${parseInt(price).toLocaleString('ru-RU')}</div>
+                            <div class="text-3xl font-bold">${parseInt(price).toLocaleString()}</div>
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center gap-3">
-                        <span class="text-3xl">🟡</span>
+                    <div class="mt-5 flex items-center gap-4">
+                        <div class="text-4xl">🟡</div>
                         <div>
-                            <div class="font-medium">Золоте облако активовано</div>
-                            <div class="text-yellow-400">Розширення: <span class="font-bold">${expand}x</span></div>
+                            <div class="font-semibold text-lg">Золоте облако</div>
+                            <div class="text-yellow-400">Expand <span class="font-bold">${expand}x</span></div>
                         </div>
                     </div>
                 </div>
             `;
-            signalsDiv.innerHTML = html + signalsDiv.innerHTML;
+            div.innerHTML = html + div.innerHTML;
         }
 
         function simulateSignal() {
             const symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"];
-            const tfs = ["15m", "30m", "1h"];
-            const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-            const tf = tfs[Math.floor(Math.random() * tfs.length)];
-            const price = 45000 + Math.random() * 55000;
-            const expand = (1.4 + Math.random() * 0.5).toFixed(2);
+            const tfs = ["5m", "15m", "30m", "1h"];
+            const s = symbols[Math.floor(Math.random()*symbols.length)];
+            const t = tfs[Math.floor(Math.random()*tfs.length)];
+            const p = Math.floor(40000 + Math.random()*70000);
+            const e = (1.35 + Math.random()*0.65).toFixed(2);
 
-            addSignal(symbol, tf, price, expand);
+            addSignal(s, t, p, e);
 
             tg.showPopup({
                 title: "🟡 ЗОЛОТЕ ОБЛАКО!",
-                message: `${symbol} • ${tf}\nЦіна: ${price.toFixed(0)}\nExpand: ${expand}x`,
+                message: `${s} ${t}\nЦіна: ${p}\nExpand: ${e}x`,
                 buttons: [{type: "ok"}]
             });
         }
 
         function clearSignals() {
             document.getElementById("signals").innerHTML = "";
-            signalCount = 0;
         }
 
-        function switchTab(tab) {
-            // Поки що просто для майбутнього розширення
-            if (tab === 1) alert("Розділ 'Сигнали' буде розширено пізніше");
-            if (tab === 2) alert("Розділ 'Статус' буде розширено пізніше");
+        function switchTab(n) {
+            if (n === 1) alert("Скоро тут буде повна історія сигналів");
+            if (n === 2) alert("Скоро тут буде статус моніторингу");
         }
 
-        // Авто-сигнал кожні 20 секунд для демо
+        // Авто-сигнал кожні 18 секунд
         setInterval(() => {
-            if (Math.random() > 0.6) simulateSignal();
-        }, 20000);
+            if (Math.random() > 0.55) simulateSignal();
+        }, 18000);
 
-        // Перший сигнал при завантаженні
-        window.onload = () => {
-            setTimeout(() => simulateSignal(), 800);
-        };
+        // Перший сигнал
+        window.onload = () => setTimeout(simulateSignal, 700);
     </script>
 </body>
 </html>
