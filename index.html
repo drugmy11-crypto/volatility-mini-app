@@ -8,42 +8,62 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { background: linear-gradient(180deg, #0a0a0a, #111827); color: #fff; font-family: system-ui; }
-        .gold { color: #ffea00; }
-        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255,234,0,0.2); }
+        body {
+            background: linear-gradient(180deg, #0a0a0a 0%, #0f172a 100%);
+            color: #fff;
+            font-family: system-ui, sans-serif;
+        }
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,234,0,0.2);
+        }
+        .gold-glow {
+            text-shadow: 0 0 30px #ffea00, 0 0 60px #ffea00;
+        }
+        .cloud {
+            animation: cloudFloat 25s linear infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
-    <!-- Header -->
-    <div class="px-5 pt-10 pb-6">
+    <!-- Header + Live BTC -->
+    <div class="px-5 pt-12 pb-6">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center text-3xl shadow-xl">⚡</div>
+                <div class="w-12 h-12 bg-gradient-to-br from-yellow-300 to-amber-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-yellow-500/50">
+                    ⚡
+                </div>
                 <div>
-                    <h1 class="text-3xl font-black tracking-tighter">VOLATILITY</h1>
-                    <p class="text-yellow-400 text-sm -mt-1">MANAGER</p>
+                    <h1 class="text-3xl font-black tracking-tighter gold-glow">VOLATILITY</h1>
+                    <p class="text-yellow-400 -mt-1 text-sm">MANAGER</p>
                 </div>
             </div>
             <div class="text-right">
-                <div id="live-price" class="text-4xl font-bold gold">68 405.67</div>
-                <div id="live-pair" class="text-xs text-green-400">BTCUSDT • +0.47%</div>
+                <div class="text-xs text-green-400 flex items-center justify-end gap-1.5">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    LIVE
+                </div>
+                <div id="live-price" class="text-5xl font-bold gold-glow">96 897</div>
+                <div id="live-symbol" class="text-sm text-yellow-400">BTCUSDT</div>
             </div>
         </div>
     </div>
 
-    <!-- Симуляція -->
-    <div class="px-5">
-        <button onclick="simulateSignal()" 
-                class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black py-8 rounded-3xl text-2xl shadow-2xl active:scale-95 transition-all">
-            🟡 СИМУЛЮВАТИ СИГНАЛ
-        </button>
+    <!-- Golden Cloud Banner -->
+    <div class="mx-5 glass rounded-3xl p-5 mb-8 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 text-[120px] opacity-10 cloud">☁️</div>
+        <div class="text-center">
+            <div class="text-yellow-400 text-sm font-medium tracking-widest">GOLDEN CLOUD ACTIVE</div>
+            <div class="text-2xl font-bold mt-1">Очікуємо потужний сигнал</div>
+        </div>
     </div>
 
-    <!-- Сигнали -->
-    <div class="px-5 mt-10">
-        <h2 class="text-xl font-semibold mb-5">Останні сигнали</h2>
-        <div id="signals" class="space-y-6"></div>
+    <!-- Pairs -->
+    <div class="px-5">
+        <h2 class="text-lg font-medium mb-4 text-zinc-400">Моніторинг пар</h2>
+        <div id="pairs" class="space-y-3"></div>
     </div>
 
     <script>
@@ -51,86 +71,41 @@
         tg.expand();
         tg.setHeaderColor("#0a0a0a");
 
-        let currentPrice = 68405.67;
+        const pairs = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"];
 
-        // Форматування з пробілами і двома десятковими знаками
-        function formatPrice(price) {
-            return price.toLocaleString('ru-RU', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
+        async function updatePrices() {
+            const container = document.getElementById("pairs");
+            container.innerHTML = "";
 
-        // Оновлення ціни кожні 300 мс
-        async function updateLivePrice() {
-            try {
-                const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
-                const data = await res.json();
-                currentPrice = parseFloat(data.price);
-                document.getElementById("live-price").textContent = formatPrice(currentPrice);
-            } catch(e) {}
-        }
+            for (let symbol of pairs) {
+                try {
+                    const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+                    const data = await res.json();
+                    const price = parseFloat(data.price);
 
-        function openChart(symbol, tf) {
-            const interval = tf === "5m" ? "5" : tf === "15m" ? "15" : tf === "30m" ? "30" : "60";
-            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}&theme=dark`;
-            tg.openLink(url, { try_instant_view: true });
-        }
-
-        function addSignal(symbol, tf, price, expand) {
-            const div = document.getElementById("signals");
-            const time = new Date().toLocaleTimeString("uk-UA", {hour:"2-digit", minute:"2-digit"});
-
-            const html = `
-                <div class="card rounded-3xl p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-3xl font-bold gold">${symbol}</span>
-                            <span class="ml-4 text-zinc-400">${tf}</span>
+                    const html = `
+                        <div class="glass rounded-3xl p-5 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="text-2xl font-bold">${symbol.replace("USDT","")}</div>
+                                <div class="text-xs text-green-400">• LIVE</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold">${price.toLocaleString('ru-RU')}</div>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-xs text-zinc-400">${time}</div>
-                            <div class="text-3xl font-bold">${formatPrice(price)}</div>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex gap-4">
-                        <div class="flex-1">
-                            <div class="text-yellow-400 text-lg">🟡 Золоте облако</div>
-                            <div class="text-yellow-400">Expand <span class="font-bold">${expand}x</span></div>
-                        </div>
-                        <button onclick="openChart('${symbol}', '${tf}')" 
-                                class="flex-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold py-4 rounded-2xl transition active:scale-95">
-                            📈 Графік
-                        </button>
-                    </div>
-                </div>
-            `;
-            div.innerHTML = html + div.innerHTML;
+                    `;
+                    container.innerHTML += html;
+                } catch(e) {}
+            }
         }
 
-        function simulateSignal() {
-            const symbols = ["BTCUSDT","ETHUSDT","SOLUSDT","XRPUSDT"];
-            const tfs = ["5m","15m","30m","1h"];
-            const s = symbols[Math.floor(Math.random()*symbols.length)];
-            const t = tfs[Math.floor(Math.random()*tfs.length)];
+        // Оновлення кожні 400 мс
+        setInterval(updatePrices, 400);
+        updatePrices();
 
-            const variation = currentPrice * (Math.random() * 0.03 - 0.015);
-            const signalPrice = currentPrice + variation;
-            const e = (1.35 + Math.random()*0.65).toFixed(2);
-
-            addSignal(s, t, signalPrice, e);
-        }
-
-        // Оновлення кожні 300 мс
-        setInterval(updateLivePrice, 300);
-        updateLivePrice(); // перший запит
-
-        // Авто-симуляція
-        setInterval(() => {
-            if (Math.random() > 0.65) simulateSignal();
-        }, 22000);
-
-        window.onload = () => setTimeout(simulateSignal, 800);
+        window.onload = () => {
+            setTimeout(updatePrices, 800);
+        };
     </script>
 </body>
 </html>
