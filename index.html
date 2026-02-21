@@ -51,23 +51,20 @@
         tg.expand();
         tg.setHeaderColor("#0a0a0a");
 
-        let currentPrice = 68405; // стартова ціна
+        let currentPrice = 68405;
 
-        // Форматування ціни з пробілом
         function formatPrice(price) {
             return Math.floor(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
 
-        // Оновлення реальної ціни кожні 3 секунди
+        // Оновлення реальної ціни кожні 450 мс
         async function updateLivePrice() {
             try {
                 const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
                 const data = await res.json();
                 currentPrice = parseFloat(data.price);
                 document.getElementById("live-price").textContent = formatPrice(currentPrice);
-            } catch(e) {
-                console.log("Не вдалося оновити ціну");
-            }
+            } catch(e) {}
         }
 
         function openChart(symbol, tf) {
@@ -113,26 +110,21 @@
             const s = symbols[Math.floor(Math.random()*symbols.length)];
             const t = tfs[Math.floor(Math.random()*tfs.length)];
 
-            // Ціна сигналу = поточна реальна ціна ± 1.5%
             const variation = currentPrice * (Math.random() * 0.03 - 0.015);
             const signalPrice = currentPrice + variation;
-
             const e = (1.35 + Math.random()*0.65).toFixed(2);
 
             addSignal(s, t, signalPrice, e);
-
-            // Оновлюємо live-ціну в хедері
-            document.getElementById("live-price").textContent = formatPrice(signalPrice);
         }
 
-        // Оновлюємо реальну ціну кожні 3 секунди
-        setInterval(updateLivePrice, 3000);
-        updateLivePrice(); // перший запит відразу
+        // Запуск оновлення ціни
+        setInterval(updateLivePrice, 450);
+        updateLivePrice();
 
-        // Авто-симуляція кожні 25 секунд
+        // Авто-симуляція
         setInterval(() => {
-            if (Math.random() > 0.6) simulateSignal();
-        }, 25000);
+            if (Math.random() > 0.65) simulateSignal();
+        }, 22000);
 
         window.onload = () => setTimeout(simulateSignal, 800);
     </script>
