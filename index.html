@@ -1,80 +1,65 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Volatility Manager</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body { margin:0; font-family: system-ui, sans-serif; background: #0a0e17; color: #fff; padding: 16px; }
-    .header { text-align: center; margin-bottom: 20px; }
-    .logo { font-size: 28px; font-weight: bold; background: linear-gradient(90deg, #ffd700, #ffaa00); -webkit-background-clip: text; color: transparent; }
-    .price { font-size: 32px; font-weight: bold; text-align: center; margin: 10px 0; }
-    .cloud { font-size: 60px; animation: pulse 2s infinite; display: block; text-align: center; margin: 20px 0; }
-    @keyframes pulse { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
-    .signal { background: rgba(255, 215, 0, 0.15); border: 2px solid #ffd700; border-radius: 12px; padding: 16px; margin: 20px 0; }
-    button { width: 100%; padding: 16px; margin: 10px 0; background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; }
-    .info { font-size: 14px; opacity: 0.8; line-height: 1.5; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Volatility Manager</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0a0a0a; color: #fff; font-family: system-ui; }
+        .tab-active { border-bottom: 3px solid #ffea00; color: #ffea00; }
+        .gold { color: #ffea00; }
+    </style>
 </head>
-<body>
-  <div class="header">
-    <div class="logo">VOLATILITY MANAGER</div>
-    <div style="font-size:12px; opacity:0.6;">ранние сигналы всплеска</div>
-  </div>
+<body class="p-4 min-h-screen pb-20">
 
-  <div id="price" class="price">$68 405</div>
-  <div style="text-align:center; color:#00ff9d; font-size:14px;" id="change">+1.2% (24ч)</div>
+    <div class="max-w-md mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold">VOLATILITY MANAGER</h1>
+            <div class="flex items-center gap-2 text-green-400">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                ONLINE
+            </div>
+        </div>
 
-  <div class="cloud" id="cloud">☁️</div>
+        <div onclick="simulateSignal()" class="bg-gradient-to-r from-yellow-500 to-amber-500 text-black font-bold py-6 rounded-3xl text-center text-xl cursor-pointer hover:scale-105 transition">
+            🟡 СИМУЛЮВАТИ ЗОЛОТЕ ОБЛАКО
+        </div>
 
-  <div class="signal">
-    <strong>Статус сигнала:</strong><br>
-    <span id="status" style="color:#ffd700; font-size:18px;">🟢 Золотое облако сформировано!</span>
-  </div>
+        <div id="signals" class="mt-8 space-y-4"></div>
+    </div>
 
-  <div class="info">
-    Биткоин возвращается к центральной оси консолидации на отметке $69 032.<br><br>
-    Динамическая цель треугольника — $74 600.<br><br>
-    Подтверждение: пробой верхней границы ≈ $69 900
-  </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-  <button onclick="simulateSignal()">Симулировать новый сигнал</button>
-  <button onclick="Telegram.WebApp.close()">Закрыть</button>
+        function simulateSignal() {
+            const symbols = ["BTCUSDT","ETHUSDT","SOLUSDT"];
+            const s = symbols[Math.floor(Math.random()*symbols.length)];
+            const price = Math.floor(50000 + Math.random()*50000);
+            const expand = (1.3 + Math.random()*0.5).toFixed(2);
+            const time = new Date().toLocaleTimeString("uk-UA");
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.setHeaderColor('#0a0e17');
-    tg.setBackgroundColor('#0a0e17');
+            const html = `
+                <div class="bg-zinc-900 rounded-3xl p-5 border border-yellow-400/30">
+                    <div class="flex justify-between">
+                        <div class="font-bold text-xl gold">${s}</div>
+                        <div class="text-right">
+                            <div class="text-xs text-zinc-400">${time}</div>
+                            <div class="text-2xl">${price}</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-yellow-400">🟡 Золоте облако • ${expand}x</div>
+                </div>
+            `;
+            document.getElementById("signals").innerHTML = html + document.getElementById("signals").innerHTML;
 
-    let priceElement = document.getElementById('price');
-    let changeElement = document.getElementById('change');
+            tg.showPopup({title: "🟡 СИГНАЛ!", message: `${s}\nЦіна: ${price}\nExpand: ${expand}x`, buttons: [{type:"ok"}]});
+        }
 
-    async function updatePrice() {
-      try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
-        const data = await res.json();
-        const btc = data.bitcoin;
-        priceElement.textContent = '$' + btc.usd.toLocaleString('ru-RU');
-        changeElement.textContent = (btc.usd_24h_change > 0 ? '+' : '') + btc.usd_24h_change.toFixed(1) + '% (24ч)';
-      } catch(e) { console.log('API error'); }
-    }
-
-    function simulateSignal() {
-      const cloud = document.getElementById('cloud');
-      const status = document.getElementById('status');
-      cloud.textContent = '✨☁️✨';
-      status.innerHTML = '🔥 МОЩНЫЙ ВСПЛЕСК ОЖИДАЕТСЯ!';
-      setTimeout(() => {
-        cloud.textContent = '☁️';
-        status.innerHTML = '🟢 Золотое облако сформировано!';
-      }, 3000);
-      tg.showPopup({title: 'Сигнал!', message: 'Золотое облако активировано! Готовься к волатильности 🚀'});
-    }
-
-    updatePrice();
-    setInterval(updatePrice, 10000);
-  </script>
+        // Перший сигнал при завантаженні
+        window.onload = () => setTimeout(simulateSignal, 800);
+    </script>
 </body>
 </html>
