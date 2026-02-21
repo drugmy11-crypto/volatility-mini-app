@@ -11,8 +11,9 @@
         body { background: linear-gradient(180deg, #0a0a0a, #111827); color: #fff; font-family: system-ui; }
         .gold { color: #ffea00; }
         .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255,234,0,0.2); }
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; }
-        iframe { width: 100%; height: 100%; border: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 999; }
+        .modal-content { animation: modalPop 0.4s ease-out; }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -49,11 +50,11 @@
     </div>
 
     <!-- Модальне вікно з графіком -->
-    <div id="chartModal" class="modal flex items-center justify-center">
-        <div class="w-full max-w-md bg-zinc-950 rounded-3xl overflow-hidden">
-            <div class="flex justify-between items-center px-5 py-4 border-b border-white/10">
-                <div id="modalTitle" class="font-bold text-lg"></div>
-                <button onclick="closeChart()" class="text-3xl text-zinc-400 hover:text-white">✕</button>
+    <div id="chartModal" class="modal flex items-center justify-center p-4">
+        <div class="modal-content w-full max-w-lg bg-zinc-950 rounded-3xl overflow-hidden border border-yellow-400/30">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-white/10">
+                <div id="modalTitle" class="font-bold text-xl gold"></div>
+                <button onclick="closeChart()" class="text-3xl text-zinc-400 hover:text-white px-3">✕</button>
             </div>
             <iframe id="chartFrame" src="" class="w-full" style="height: 520px;"></iframe>
         </div>
@@ -65,19 +66,19 @@
         tg.setHeaderColor("#0a0a0a");
 
         function openChart(symbol, tf) {
-            document.getElementById("modalTitle").textContent = `${symbol} • ${tf}`;
+            document.getElementById("modalTitle").innerHTML = `${symbol} <span class="text-zinc-400 text-base ml-2">${tf}</span>`;
             
-            // TradingView вбудований графік (темна тема)
             const interval = tf === "5m" ? "5" : tf === "15m" ? "15" : tf === "30m" ? "30" : "60";
-            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}&theme=dark&hide_side_toolbar=1&hide_top_toolbar=1&hide_legend=1`;
+            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}&theme=dark&hide_side_toolbar=1&hide_top_toolbar=1&hide_legend=1&hide_volume=1`;
             
             document.getElementById("chartFrame").src = url;
             document.getElementById("chartModal").style.display = "flex";
         }
 
         function closeChart() {
-            document.getElementById("chartModal").style.display = "none";
-            document.getElementById("chartFrame").src = ""; // очищаємо
+            const modal = document.getElementById("chartModal");
+            modal.style.display = "none";
+            document.getElementById("chartFrame").src = "";
         }
 
         function addSignal(symbol, tf, price, expand) {
@@ -96,14 +97,14 @@
                             <div class="text-3xl font-bold">${parseInt(price).toLocaleString()}</div>
                         </div>
                     </div>
-                    <div class="mt-6 flex gap-3">
+                    <div class="mt-6 flex gap-4">
                         <div class="flex-1">
-                            <div class="text-sm text-zinc-400">Золоте облако</div>
-                            <div class="text-yellow-400 text-lg">Expand <span class="font-bold">${expand}x</span></div>
+                            <div class="text-yellow-400 text-lg">🟡 Золоте облако</div>
+                            <div class="text-yellow-400">Expand <span class="font-bold">${expand}x</span></div>
                         </div>
                         <button onclick="openChart('${symbol}', '${tf}')" 
-                                class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl font-medium flex items-center justify-center gap-2 transition">
-                            📈 Графік
+                                class="flex-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold py-4 rounded-2xl transition active:scale-95">
+                            📈 Відкрити графік
                         </button>
                     </div>
                 </div>
