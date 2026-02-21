@@ -11,9 +11,6 @@
         body { background: linear-gradient(180deg, #0a0a0a, #111827); color: #fff; font-family: system-ui; }
         .gold { color: #ffea00; }
         .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255,234,0,0.2); }
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 999; }
-        .modal-content { animation: modalPop 0.4s ease-out; }
-        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -35,7 +32,7 @@
         </div>
     </div>
 
-    <!-- Quick Action -->
+    <!-- Симуляція сигналу -->
     <div class="px-5">
         <button onclick="simulateSignal()" 
                 class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black py-8 rounded-3xl text-2xl shadow-2xl active:scale-95 transition-all">
@@ -43,21 +40,10 @@
         </button>
     </div>
 
-    <!-- Signals -->
+    <!-- Сигнали -->
     <div class="px-5 mt-10">
         <h2 class="text-xl font-semibold mb-5">Останні сигнали</h2>
         <div id="signals" class="space-y-6"></div>
-    </div>
-
-    <!-- Модальне вікно з графіком -->
-    <div id="chartModal" class="modal flex items-center justify-center p-4">
-        <div class="modal-content w-full max-w-lg bg-zinc-950 rounded-3xl overflow-hidden border border-yellow-400/30">
-            <div class="flex justify-between items-center px-6 py-4 border-b border-white/10">
-                <div id="modalTitle" class="font-bold text-xl gold"></div>
-                <button onclick="closeChart()" class="text-3xl text-zinc-400 hover:text-white px-3">✕</button>
-            </div>
-            <iframe id="chartFrame" src="" class="w-full" style="height: 520px;"></iframe>
-        </div>
     </div>
 
     <script>
@@ -66,19 +52,11 @@
         tg.setHeaderColor("#0a0a0a");
 
         function openChart(symbol, tf) {
-            document.getElementById("modalTitle").innerHTML = `${symbol} <span class="text-zinc-400 text-base ml-2">${tf}</span>`;
-            
+            // Відкриваємо графік у браузері (стабільно працює)
             const interval = tf === "5m" ? "5" : tf === "15m" ? "15" : tf === "30m" ? "30" : "60";
-            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}&theme=dark&hide_side_toolbar=1&hide_top_toolbar=1&hide_legend=1&hide_volume=1`;
+            const url = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}&interval=${interval}&theme=dark`;
             
-            document.getElementById("chartFrame").src = url;
-            document.getElementById("chartModal").style.display = "flex";
-        }
-
-        function closeChart() {
-            const modal = document.getElementById("chartModal");
-            modal.style.display = "none";
-            document.getElementById("chartFrame").src = "";
+            tg.openLink(url, { try_instant_view: true });
         }
 
         function addSignal(symbol, tf, price, expand) {
@@ -129,7 +107,6 @@
             });
         }
 
-        // Перший сигнал
         window.onload = () => setTimeout(simulateSignal, 700);
     </script>
 </body>
