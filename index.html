@@ -34,7 +34,7 @@
 </head>
 <body class="min-h-screen pb-24">
 
-    <!-- Головний екран -->
+    <!-- Головний екран (залишається як був) -->
     <div id="main-screen">
         <div class="px-6 pt-10 pb-6 text-center">
             <h1 class="text-3xl font-black tracking-tighter gold">VOLATILITY</h1>
@@ -43,7 +43,7 @@
 
         <div class="px-5 grid grid-cols-2 gap-4">
 
-            <!-- BTC -->
+            <!-- BTC - з новим функціоналом -->
             <div onclick="openDetail('BTC')" class="glass rounded-3xl p-5 cursor-pointer active:scale-95 transition">
                 <div class="flex items-center gap-4">
                     <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" class="w-12 h-12" alt="BTC">
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <!-- Детальний екран BTC -->
+    <!-- НОВИЙ РОЗГОРНУТИЙ ЕКРАН ДЛЯ BTC -->
     <div id="detail-screen" class="hidden min-h-screen bg-[#0a0a0a]">
 
         <!-- Фіксована міні-карточка зверху -->
@@ -109,12 +109,15 @@
         </div>
 
         <div class="pt-24 px-5 space-y-6">
+
+            <!-- Golden Cloud -->
             <div class="glass rounded-3xl p-6 text-center">
                 <div class="text-yellow-400 text-sm tracking-widest">GOLDEN CLOUD ACTIVE</div>
                 <div class="text-5xl font-black gold mt-2">1.74x</div>
                 <div class="text-zinc-400 mt-1">Сильне розширення</div>
             </div>
 
+            <!-- Просадка від ATH -->
             <div class="glass rounded-3xl p-6">
                 <div class="flex justify-between mb-3">
                     <span class="text-zinc-400">Просадка від ATH</span>
@@ -125,10 +128,51 @@
                 </div>
                 <div class="text-xs text-zinc-400 mt-2">ATH: $124 000 (2024)</div>
             </div>
+
+            <!-- Ринковий цикл -->
+            <div class="glass rounded-3xl p-6">
+                <div class="text-zinc-400 mb-2">Ринковий цикл</div>
+                <div class="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-6 py-3 rounded-2xl font-medium">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    БИЧИЙ ЦИКЛ
+                </div>
+            </div>
+
+            <!-- Халвинг -->
+            <div class="glass rounded-3xl p-6">
+                <div class="grid grid-cols-2 gap-8 text-center">
+                    <div>
+                        <div class="text-xs text-zinc-400">Після халвінгу</div>
+                        <div class="text-3xl font-bold">412 днів</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-zinc-400">До наступного</div>
+                        <div class="text-3xl font-bold">640 днів</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прогноз циклу -->
+            <div class="glass rounded-3xl p-6">
+                <div class="text-zinc-400 text-sm mb-3">Прогноз піку циклу</div>
+                <div class="flex justify-center">
+                    <div class="relative w-44 h-44">
+                        <svg class="w-44 h-44 -rotate-90" viewBox="0 0 42 42">
+                            <circle cx="21" cy="21" r="15" fill="none" stroke="#27272a" stroke-width="7"></circle>
+                            <circle cx="21" cy="21" r="15" fill="none" stroke="#67e8f9" stroke-width="7" stroke-dasharray="94" stroke-dashoffset="28" stroke-linecap="round"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <div class="text-5xl font-black">180</div>
+                            <div class="text-xs text-zinc-400 -mt-1">днів до піку</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Нижнє меню з іконками -->
+    <!-- Нижнє меню (залишається як було) -->
     <div class="nav-glass fixed bottom-0 left-0 right-0 py-3">
         <div class="flex justify-around items-center text-xs">
             <button onclick="switchTab(0)" class="flex flex-col items-center nav-active">
