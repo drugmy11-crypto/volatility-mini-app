@@ -42,7 +42,7 @@
 
         <div class="px-5 grid grid-cols-2 gap-4">
 
-            <!-- BTC -->
+            <!-- BTC - з новим функціоналом -->
             <div onclick="openDetail('BTC')" class="glass rounded-3xl p-5 cursor-pointer active:scale-95 transition">
                 <div class="flex items-center gap-4">
                     <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" class="w-12 h-12" alt="BTC">
@@ -93,10 +93,10 @@
         </div>
     </div>
 
-    <!-- Детальний екран BTC -->
+    <!-- Детальний екран для BTC -->
     <div id="detail-screen" class="hidden min-h-screen bg-[#0a0a0a]">
 
-        <!-- Фіксована міні-карточка -->
+        <!-- Фіксована міні-карточка зверху -->
         <div class="mini-header fixed top-0 left-0 right-0 z-50 px-5 py-4 border-b border-white/10 flex items-center gap-4">
             <button onclick="backToMain()" class="text-3xl text-zinc-400 pr-4">←</button>
             <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" class="w-9 h-9">
@@ -108,6 +108,7 @@
         </div>
 
         <div class="pt-24 px-5 space-y-6">
+
             <!-- Golden Cloud -->
             <div class="glass rounded-3xl p-6 text-center">
                 <div class="text-yellow-400 text-sm tracking-widest">GOLDEN CLOUD ACTIVE</div>
@@ -133,6 +134,20 @@
                 <div class="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-6 py-3 rounded-2xl font-medium">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                     БИЧИЙ ЦИКЛ
+                </div>
+            </div>
+
+            <!-- Халвинг -->
+            <div class="glass rounded-3xl p-6">
+                <div class="grid grid-cols-2 gap-8 text-center">
+                    <div>
+                        <div class="text-xs text-zinc-400">Після халвінгу</div>
+                        <div class="text-3xl font-bold">412 днів</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-zinc-400">До наступного</div>
+                        <div class="text-3xl font-bold">640 днів</div>
+                    </div>
                 </div>
             </div>
 
@@ -185,9 +200,7 @@
 
         function switchTab(tab) {
             if (tab === 0) return;
-            if (tab === 1) alert("Аналитика — скоро");
-            if (tab === 2) alert("Статистика — скоро");
-            if (tab === 3) alert("Личный кабинет — скоро");
+            alert("Ця вкладка скоро буде готова");
         }
     </script>
 </body>
