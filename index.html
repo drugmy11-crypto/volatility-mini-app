@@ -30,6 +30,10 @@
         .nav-active {
             color: #67e8f9;
         }
+        .coin-logo {
+            width: 42px;
+            height: 42px;
+        }
     </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -43,52 +47,48 @@
 
         <div class="px-5 grid grid-cols-2 gap-4">
 
-            <!-- BTC -->
-            <div onclick="openDetail('BTC')" class="glass rounded-3xl p-5 cursor-pointer active:scale-95 transition">
-                <div class="flex items-center gap-4">
-                    <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" class="w-12 h-12" alt="BTC">
-                    <div class="flex-1">
-                        <div class="font-bold text-2xl">BTC</div>
-                        <div id="btc-price" class="text-2xl font-bold">96 897.34</div>
+            <div onclick="openDetail('BTC')" class="glass rounded-3xl p-4 cursor-pointer active:scale-95 transition">
+                <div class="flex items-center gap-3">
+                    <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" class="coin-logo" alt="BTC">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold">BTC</div>
+                        <div id="btc-price" class="text-xl font-bold">96 897.34</div>
                     </div>
                 </div>
-                <div id="btc-change" class="mt-3 text-green-400 font-medium text-sm">+2.34%</div>
+                <div id="btc-change" class="mt-1 text-green-400 text-sm">+2.34%</div>
             </div>
 
-            <!-- ETH -->
-            <div onclick="openPair('ETHUSDT')" class="glass rounded-3xl p-5 cursor-pointer active:scale-95 transition">
-                <div class="flex items-center gap-4">
-                    <img src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" class="w-12 h-12" alt="ETH">
-                    <div class="flex-1">
-                        <div class="font-bold text-2xl">ETH</div>
-                        <div id="eth-price" class="text-2xl font-bold">3 245.67</div>
+            <div onclick="openPair('ETHUSDT')" class="glass rounded-3xl p-4 cursor-pointer active:scale-95 transition">
+                <div class="flex items-center gap-3">
+                    <img src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" class="coin-logo" alt="ETH">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold">ETH</div>
+                        <div id="eth-price" class="text-xl font-bold">3 245.67</div>
                     </div>
                 </div>
-                <div id="eth-change" class="mt-3 text-green-400 font-medium text-sm">+1.87%</div>
+                <div id="eth-change" class="mt-1 text-green-400 text-sm">+1.87%</div>
             </div>
 
-            <!-- SOL -->
-            <div onclick="openPair('SOLUSDT')" class="glass rounded-3xl p-5 cursor-pointer active:scale-95 transition">
-                <div class="flex items-center gap-4">
-                    <img src="https://assets.coingecko.com/coins/images/4128/small/solana.png" class="w-12 h-12" alt="SOL">
-                    <div class="flex-1">
-                        <div class="font-bold text-2xl">SOL</div>
-                        <div id="sol-price" class="text-2xl font-bold">184.56</div>
+            <div onclick="openPair('SOLUSDT')" class="glass rounded-3xl p-4 cursor-pointer active:scale-95 transition">
+                <div class="flex items-center gap-3">
+                    <img src="https://assets.coingecko.com/coins/images/4128/small/solana.png" class="coin-logo" alt="SOL">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold">SOL</div>
+                        <div id="sol-price" class="text-xl font-bold">184.56</div>
                     </div>
                 </div>
-                <div id="sol-change" class="mt-3 text-red-400 font-medium text-sm">-0.92%</div>
+                <div id="sol-change" class="mt-1 text-red-400 text-sm">-0.92%</div>
             </div>
 
-            <!-- XRP -->
-            <div onclick="openPair('XRPUSDT')" class="glass rounded-3xl p-5 cursor-pointer active:scale-95 transition">
-                <div class="flex items-center gap-4">
-                    <img src="https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png" class="w-12 h-12" alt="XRP">
-                    <div class="flex-1">
-                        <div class="font-bold text-2xl">XRP</div>
-                        <div id="xrp-price" class="text-2xl font-bold">2.34</div>
+            <div onclick="openPair('XRPUSDT')" class="glass rounded-3xl p-4 cursor-pointer active:scale-95 transition">
+                <div class="flex items-center gap-3">
+                    <img src="https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png" class="coin-logo" alt="XRP">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold">XRP</div>
+                        <div id="xrp-price" class="text-xl font-bold">2.34</div>
                     </div>
                 </div>
-                <div id="xrp-change" class="mt-3 text-green-400 font-medium text-sm">+4.12%</div>
+                <div id="xrp-change" class="mt-1 text-green-400 text-sm">+4.12%</div>
             </div>
 
         </div>
@@ -96,8 +96,6 @@
 
     <!-- Детальний екран BTC -->
     <div id="detail-screen" class="hidden min-h-screen bg-[#0a0a0a]">
-
-        <!-- Фіксована міні-карточка -->
         <div class="mini-header fixed top-0 left-0 right-0 z-50 px-5 py-4 border-b border-white/10 flex items-center gap-4">
             <button onclick="backToMain()" class="text-3xl text-zinc-400 pr-4">←</button>
             <img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" class="w-9 h-9">
@@ -109,11 +107,9 @@
         </div>
 
         <div class="pt-24 px-5 space-y-6">
-
             <div class="glass rounded-3xl p-6 text-center">
                 <div class="text-yellow-400 text-sm tracking-widest">GOLDEN CLOUD ACTIVE</div>
                 <div class="text-5xl font-black gold mt-2">1.74x</div>
-                <div class="text-zinc-400 mt-1">Сильне розширення</div>
             </div>
 
             <div class="glass rounded-3xl p-6">
@@ -124,30 +120,48 @@
                 <div class="h-2.5 bg-zinc-800 rounded-full overflow-hidden">
                     <div class="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full w-[63%]"></div>
                 </div>
-                <div class="text-xs text-zinc-400 mt-2">ATH: $124 000 (2024)</div>
             </div>
+        </div>
+    </div>
 
+    <!-- Екран Кабінет -->
+    <div id="cabinet-screen" class="hidden min-h-screen bg-[#0a0a0a]">
+        <div class="mini-header fixed top-0 left-0 right-0 z-50 px-5 py-4 border-b border-white/10 flex items-center gap-4">
+            <button onclick="backToMain()" class="text-3xl text-zinc-400 pr-4">←</button>
+            <div class="font-bold text-xl">Кабінет</div>
+        </div>
+
+        <div class="pt-24 px-5 space-y-6">
             <div class="glass rounded-3xl p-6">
-                <div class="text-zinc-400 mb-2">Ринковий цикл</div>
-                <div class="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-6 py-3 rounded-2xl font-medium">
-                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                    БИЧИЙ ЦИКЛ
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <div class="text-sm text-yellow-400">ПРОБНИЙ ДОСТУП</div>
+                        <div class="text-2xl font-bold">7 днів</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-green-400">6д 14ч</div>
+                    </div>
+                </div>
+                <div class="h-2.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div class="h-full w-[35%] bg-gradient-to-r from-yellow-400 to-amber-500"></div>
                 </div>
             </div>
 
-            <div class="glass rounded-3xl p-6">
-                <div class="grid grid-cols-2 gap-8 text-center">
-                    <div>
-                        <div class="text-xs text-zinc-400">Після халвінгу</div>
-                        <div class="text-3xl font-bold">412 днів</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-zinc-400">До наступного</div>
-                        <div class="text-3xl font-bold">640 днів</div>
-                    </div>
+            <div class="glass rounded-3xl p-6 space-y-4">
+                <div class="flex justify-between">
+                    <span class="text-zinc-400">Тип підписки</span>
+                    <span>Пробний</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-zinc-400">Наступний платіж</span>
+                    <span>15 березня 2026</span>
                 </div>
             </div>
 
+            <button onclick="extendSubscription()" 
+                    class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black py-6 rounded-3xl text-xl">
+                ПРОДЛИТЬ ПОДПИСКУ
+            </button>
         </div>
     </div>
 
@@ -189,11 +203,10 @@
                     const change = parseFloat(data.priceChangePercent);
 
                     const base = symbol.replace("USDT", "").toLowerCase();
-
                     const priceEl = document.getElementById(base + "-price");
                     const changeEl = document.getElementById(base + "-change");
 
-                    if (priceEl) priceEl.textContent = price.toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    if (priceEl) priceEl.textContent = price.toLocaleString('ru-RU', {minimumFractionDigits: 2});
                     if (changeEl) {
                         changeEl.textContent = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
                         changeEl.className = change >= 0 ? "mt-3 text-green-400 font-medium text-sm" : "mt-3 text-red-400 font-medium text-sm";
@@ -212,6 +225,7 @@
         function backToMain() {
             document.getElementById("detail-screen").classList.add("hidden");
             document.getElementById("main-screen").classList.remove("hidden");
+            document.getElementById("cabinet-screen").classList.add("hidden");
         }
 
         function openPair(symbol) {
@@ -220,8 +234,21 @@
         }
 
         function switchTab(tab) {
-            if (tab === 0) return;
-            alert("Ця вкладка скоро буде готова");
+            if (tab === 0) {
+                document.getElementById("main-screen").classList.remove("hidden");
+                document.getElementById("detail-screen").classList.add("hidden");
+                document.getElementById("cabinet-screen").classList.add("hidden");
+            }
+            if (tab === 3) {
+                document.getElementById("main-screen").classList.add("hidden");
+                document.getElementById("detail-screen").classList.add("hidden");
+                document.getElementById("cabinet-screen").classList.remove("hidden");
+            }
+            if (tab === 1 || tab === 2) alert("Ця вкладка скоро буде готова");
+        }
+
+        function extendSubscription() {
+            alert("Функція продовження підписки скоро буде доступна");
         }
 
         // Запуск
